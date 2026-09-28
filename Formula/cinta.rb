@@ -6,10 +6,9 @@ class Cinta < Formula
 
   desc "Record, download and transcribe audio and video from the command-line"
   homepage "https://github.com/alexdlp/cinta"
-  url "https://github.com/alexdlp/cinta/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "7b456babd141cb3be7fff59436b03e86caaf10803ad799ea000bfdcd01cf15a3"
+  url "https://github.com/alexdlp/cinta/archive/refs/tags/v0.1.1.tar.gz"
+  sha256 "366baa105146a61ef95f4ae1c66287dc8998a3375a052d42936148b55a134838"
   license "MIT"
-  revision 1
 
   depends_on "ffmpeg"
   depends_on macos: :ventura # ScreenCaptureKit with system audio
@@ -35,6 +34,9 @@ class Cinta < Formula
     system "swift", "build", "--disable-sandbox", "-c", "release",
            "--package-path", "swift/cintarec"
     libexec.install "swift/cintarec/.build/release/cintarec"
+
+    # Where zsh looks with no setup, so Tab completion works on the next shell.
+    zsh_completion.install "completions/_cinta"
 
     install_models libexec/"models"
 
@@ -99,6 +101,7 @@ class Cinta < Formula
     assert_equal "cinta #{version}", shell_output("#{bin}/cinta --version").strip
     assert_equal version.to_s, shell_output("#{libexec}/cintarec --version").strip
     assert_match "transcribe", shell_output("#{bin}/cinta --help")
+    assert_path_exists zsh_completion/"_cinta"
     # Exit code 20 is cintarec rejecting its arguments, which it does before
     # asking macOS for any permission, so this runs anywhere.
     shell_output("#{libexec}/cintarec --fps 0 --output #{testpath}/x.mov 2>&1", 20)
